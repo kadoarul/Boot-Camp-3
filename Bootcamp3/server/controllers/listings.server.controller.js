@@ -55,26 +55,51 @@ exports.read = function(req, res) {
 
 /* Update a listing - note the order in which this function is called by the router*/
 exports.update = function(req, res) {
-  var listing = req.listing;
-
   /* Replace the listings's properties with the new properties found in req.body */
- 
+
   /*save the coordinates (located in req.results if there is an address property) */
  
   /* Save the listing */
+  var listing = req.listing;
+  if(listing.code && listing.name && listing.address){
+    listing.code = req.body.code;
+    listing.name = req.body.name;
+    listing.address = req.body.address;
 
+    if(listing.coordinates){
+      listing.coordinates = req.results;}
+      
+    listing.save(function(err){
+      if(err){
+        res.status(400).send(err);}
+      else{
+        res.json(listing);}
+    });
+  }
+  else{
+      res.status(400).send();}
 };
 
 /* Delete a listing */
 exports.delete = function(req, res) {
   var listing = req.listing;
-
+  Listing.findByIdAndDelete(listing._id, function(err, listing){
+    if (err){
+      res.status(400).send(err);}
+    else{
+      res.json(listing);}
+  });
   /* Add your code to remove the listins */
-
 };
 
 /* Retreive all the directory listings, sorted alphabetically by listing code */
 exports.list = function(req, res) {
+  Listing.find({},function(err, listing){
+    if(err){
+      res.status(400).send(err);}
+    else{
+      res.json(listing);}
+  });
   /* Add your code */
 };
 

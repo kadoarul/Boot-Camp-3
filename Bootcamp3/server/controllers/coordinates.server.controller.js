@@ -21,7 +21,7 @@ module.exports = function(req, res, next) {
     request({
       url: 'https://api.opencagedata.com/geocode/v1/json', 
       qs: options
-      }, function(error, response, body) {
+      }, function(error, response, body){
         //For ideas about response and error processing see https://opencagedata.com/tutorials/geocode-in-nodejs
         
         //JSON.parse to get contents. Remember to look at the response's JSON format in open cage data
@@ -33,9 +33,21 @@ module.exports = function(req, res, next) {
           Assumption: if we get a result we will take the coordinates from the first result returned
         */
         //  req.results = stores you coordinates
-        next();
+        if(error){
+          response.status(400).send(err);}
+        else{
+          var object = JSON.parse(body).results;
+          var geometry = object[0].geometry;
+          var lat = geometry['lat'];
+          var long = geometry['lng'];
+          var coords = {
+            lat: lat,
+            lng: long
+          }
+          req.results = coords;
+          next();}
     });
-  } else {
+  } else{
     next();
   }
 };  
